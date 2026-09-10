@@ -68,7 +68,7 @@ class Plummer(LensProfileBase):
         return rho
 
     @staticmethod
-    def density_2d(self, x, y, M_b, a, center_x=0, center_y=0):
+    def density_2d(x, y, M_b, a, center_x=0, center_y=0):
         """Projected density along the line of sight at coordinate (x, y).
 
         :param x: x-coordinate
@@ -109,8 +109,9 @@ class Plummer(LensProfileBase):
         )
 
         return mass_3d
-
-    def mass_2d(self, R, M_b, a):
+        
+    @staticmethod
+    def mass_2d(R, M_b, a):
         """Mass enclosed within a projected 2-d radius R.
 
         :param R: projected radius
@@ -135,16 +136,16 @@ class Plummer(LensProfileBase):
         self,
         x,
         y,
-        sigma0,
         a,
+        sigma0,
         center_x=0,
         center_y=0,
     ):
         """Lensing potential of the Plummer profile.
 
         The lensing parameters are:
-            sigma0 : lensing normalization
             a      : Plummer scale radius in angular units
+            sigma0 : lensing normalization
 
         :param x: x-coordinate position [arcsec]
         :param y: y-coordinate position [arcsec]
