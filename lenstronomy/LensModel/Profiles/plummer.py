@@ -25,19 +25,13 @@ the Plummer profile. The projected surface mass density is
     {\\pi (R^2 + a^2)^2}.
 """
 
-from lenstronomy.Cosmo.lens_cosmo import LensCosmo
 import numpy as np
 from lenstronomy.LensModel.Profiles.base_profile import LensProfileBase
-from lenstronomy.Util import constants
 
 class Plummer(LensProfileBase):
 
-    def __init__(self, light, stellar_mass_bulge, size_bulge_true):
+    def __init__(self):
         super().__init__()
-
-        self._light = light
-        self._stellar_mass_bulge = stellar_mass_bulge
-        self._size_bulge_true = size_bulge_true
 
     param_names = [
     "a",
@@ -73,6 +67,7 @@ class Plummer(LensProfileBase):
         
         return rho
 
+    @staticmethod
     def density_2d(self, x, y, M_b, a, center_x=0, center_y=0):
         """Projected density along the line of sight at coordinate (x, y).
 
@@ -164,7 +159,6 @@ class Plummer(LensProfileBase):
         y_ = y - center_y
 
         R = np.sqrt(x_**2 + y_**2)
-        R = np.maximum(R, 1e-10)
 
         # Lensing potential of the Plummer profile.
         potential = sigma0 * 0.5 * np.log(R**2 + a**2)
@@ -223,7 +217,7 @@ class Plummer(LensProfileBase):
 
         :param x: x-coordinate position [arcsec]
         :param y: y-coordinate position [arcsec]
-    :   param a: Plummer scale radius [arcsec]
+        :param a: Plummer scale radius [arcsec]
         :param sigma0: lensing normalization
         :param center_x: x-center of the profile [arcsec]
         :param center_y: y-center of the profile [arcsec]
@@ -252,38 +246,3 @@ class Plummer(LensProfileBase):
         f_yx = f_xy
 
         return f_xx, f_xy, f_yx, f_yy
-
-    def mass_model_lenstronomy(self, lens_cosmo, spherical=False):
-        """Returns the Plummer lens model and its parameters.
-
-        :param lens_cosmo: lenstronomy LensCosmo instance
-        :param spherical: whether to use a spherical profile
-        :return: lens model list and lens model parameters
-        """
-
-        lens_mass_model_list = ["PLUMMER"]
-
-        center_x, center_y = self._light.extended_source_position
-
-        # Stellar mass of the bulge
-        M_b = self._stellar_mass_bulge
-
-        # Plummer scale radius in arcsec
-        a = self._size_bulge_true
-
-        # Critical surface mass density in M_sun / arcsec^2
-        sigma_crit = lens_cosmo.sigma_crit_angle
-
-        # Lensing normalization
-        sigma0 = M_b / (np.pi * sigma_crit)
-
-        kwargs_lens_mass = [
-            {
-                "sigma0": sigma0,
-                "a": a,
-                "center_x": center_x,
-                "center_y": center_y,
-            }
-        ]
-
-        return lens_mass_model_list, kwargs_lens_mass
